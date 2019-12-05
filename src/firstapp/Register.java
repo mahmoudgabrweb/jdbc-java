@@ -233,7 +233,7 @@ public class Register extends javax.swing.JFrame {
     private void emptyInputFields() {
         nameField.setText("");
         passwordField.setText("");
-        ageField.setText("");
+        ageField.setText(""); 
         addressField.setText("");
         jobField.setText("");
         nationalityField.setText("");
