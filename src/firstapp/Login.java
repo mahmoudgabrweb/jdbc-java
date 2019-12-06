@@ -1,6 +1,5 @@
 package firstapp;
 
-import Config.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,14 +14,15 @@ import javax.swing.JOptionPane;
  */
 public class Login extends javax.swing.JFrame {
 
-    private DBConnection dbConnect;
-    private PreparedStatement st;
+    private final Connection connect;
 
     /**
      * Creates new form Login
+     * @param connect
      */
-    public Login() {
+    public Login(Connection connect) {
         initComponents();
+        this.connect = connect;
     }
 
     /**
@@ -103,8 +103,6 @@ public class Login extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        dbConnect = new DBConnection();
-        Connection connect = dbConnect.getConnection();
 
         String usernameValue = usernameField.getText();
         String passwordValue = new String(passwordField.getPassword());
@@ -112,10 +110,12 @@ public class Login extends javax.swing.JFrame {
         String query = "SELECT * FROM users WHERE username='" + usernameValue + "' AND password='" + passwordValue + "'";
 
         try {
-            st = connect.prepareStatement(query);
+            PreparedStatement st = connect.prepareStatement(query);
             ResultSet rs = st.executeQuery();
-            if (rs.last()) {
+            if (rs.first()) {
+                int user_id = rs.getInt("id");
                 JOptionPane.showMessageDialog(null, "Success", "Success", JOptionPane.INFORMATION_MESSAGE);
+                new Profile(connect, user_id).setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
 

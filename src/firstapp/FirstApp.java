@@ -5,6 +5,9 @@
  */
 package firstapp;
 
+import Config.DBConnection;
+import java.sql.Connection;
+
 /**
  *
  * @author mahmoudgabr
@@ -15,7 +18,9 @@ public class FirstApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        new Register().setVisible(true);
+        DBConnection dbConnect = new DBConnection();
+        Connection connect = dbConnect.getConnection();
+        new Register(connect).setVisible(true);
     }
     
 }

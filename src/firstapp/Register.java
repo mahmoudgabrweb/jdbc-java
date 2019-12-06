@@ -19,13 +19,15 @@ import javax.swing.JOptionPane;
  */
 public class Register extends javax.swing.JFrame {
 
-    private DBConnection dbConnect;
+    private final Connection connect;
 
     /**
      * Creates new form Register
+     * @param connect
      */
-    public Register() {
+    public Register(Connection connect) {
         initComponents();
+        this.connect = connect;
     }
 
     /**
@@ -193,8 +195,6 @@ public class Register extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        dbConnect = new DBConnection();
-        Connection connect = dbConnect.getConnection();
         PreparedStatement st;
         String nameValue = nameField.getText();
         String passwordValue = new String(passwordField.getPassword());
@@ -213,7 +213,7 @@ public class Register extends javax.swing.JFrame {
             if (result == 1) {
                 JOptionPane.showMessageDialog(null, "Success", "User data saved successfully.", JOptionPane.INFORMATION_MESSAGE);
                 emptyInputFields();
-                new Login().setVisible(true);
+                new Login(connect).setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "Error", "Problem in saving user data.", JOptionPane.ERROR_MESSAGE);
             }
@@ -227,7 +227,7 @@ public class Register extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        new Login().setVisible(true);
+        new Login(connect).setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void emptyInputFields() {
