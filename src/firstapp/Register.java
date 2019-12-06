@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import services.UserService;
+import tables.User;
 
 /**
  *
@@ -22,6 +24,7 @@ public class Register extends javax.swing.JFrame {
 
     /**
      * Creates new form Register
+     *
      * @param connect
      */
     public Register(Connection connect) {
@@ -195,35 +198,20 @@ public class Register extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        PreparedStatement st;
-        String nameValue = nameField.getText();
-        String passwordValue = new String(passwordField.getPassword());
         int ageValue = Integer.parseInt(ageField.getText());
-        String addressValue = addressField.getText();
-        String jobValue = jobField.getText();
-        String nationalityValue = nationalityField.getText();
-        String usernameValue = usernameField.getText();
+        User user = new User(ageValue, nameField.getText(), addressField.getText(), jobField.getText(), nationalityField.getText(), usernameField.getText());
+        user.setPassword(new String(passwordField.getPassword()));
 
-        String query = "INSERT INTO users(name,age,address,job,nationality,username,password) "
-                + "VALUES('" + nameValue + "', " + ageValue + ",'" + addressValue + "','" + jobValue + "','" + nationalityValue + "','" + usernameValue + "','" + passwordValue + "')";
+        boolean result = new UserService(connect).saveUser(user);
 
-        try {
-            st = connect.prepareStatement(query);
-            int result = st.executeUpdate();
-            if (result == 1) {
-                JOptionPane.showMessageDialog(null, "Success", "User data saved successfully.", JOptionPane.INFORMATION_MESSAGE);
-                emptyInputFields();
-                new Login(connect).setVisible(true);
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(null, "Error", "Problem in saving user data.", JOptionPane.ERROR_MESSAGE);
-            }
-            st.close();
-        } catch (SQLException ex) {
+        if (result) {
+            JOptionPane.showMessageDialog(null, "Success", "User data saved successfully.", JOptionPane.INFORMATION_MESSAGE);
+            emptyInputFields();
+            new Login(connect).setVisible(true);
+            dispose();
+        } else {
             JOptionPane.showMessageDialog(null, "Error", "Problem in saving user data.", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -235,7 +223,7 @@ public class Register extends javax.swing.JFrame {
     private void emptyInputFields() {
         nameField.setText("");
         passwordField.setText("");
-        ageField.setText(""); 
+        ageField.setText("");
         addressField.setText("");
         jobField.setText("");
         nationalityField.setText("");
