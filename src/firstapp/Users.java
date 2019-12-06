@@ -90,7 +90,7 @@ public class Users extends javax.swing.JFrame {
                 java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, true, true, true, true, true
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -104,6 +104,10 @@ public class Users extends javax.swing.JFrame {
         jScrollPane1.setViewportView(usersTable);
         if (usersTable.getColumnModel().getColumnCount() > 0) {
             usersTable.getColumnModel().getColumn(0).setResizable(false);
+            usersTable.getColumnModel().getColumn(1).setResizable(false);
+            usersTable.getColumnModel().getColumn(3).setResizable(false);
+            usersTable.getColumnModel().getColumn(4).setResizable(false);
+            usersTable.getColumnModel().getColumn(5).setResizable(false);
         }
 
         jPanel1.setBackground(new java.awt.Color(204, 255, 255));
