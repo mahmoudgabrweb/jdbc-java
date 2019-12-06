@@ -51,6 +51,8 @@ public class Profile extends javax.swing.JFrame {
                 jobLabel.setText(resultSet.getString("job"));
                 nationalityLabel.setText(resultSet.getString("nationality"));
             }
+            
+            st.close();
 
         } catch (SQLException ex) {
             Logger.getLogger(Profile.class.getName()).log(Level.SEVERE, null, ex);
