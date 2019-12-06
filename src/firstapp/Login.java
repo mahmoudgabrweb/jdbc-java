@@ -114,11 +114,11 @@ public class Login extends javax.swing.JFrame {
             ResultSet rs = st.executeQuery();
             if (rs.first()) {
                 int user_id = rs.getInt("id");
-                JOptionPane.showMessageDialog(null, "Success", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Success", "Success", JOptionPane.INFORMATION_MESSAGE);          
                 new Profile(connect, user_id).setVisible(true);
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
-
             }
         } catch (SQLException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);

@@ -214,6 +214,7 @@ public class Register extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Success", "User data saved successfully.", JOptionPane.INFORMATION_MESSAGE);
                 emptyInputFields();
                 new Login(connect).setVisible(true);
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Error", "Problem in saving user data.", JOptionPane.ERROR_MESSAGE);
             }
@@ -228,6 +229,7 @@ public class Register extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         new Login(connect).setVisible(true);
+        dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void emptyInputFields() {
