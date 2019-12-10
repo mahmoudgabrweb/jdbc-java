@@ -6,21 +6,34 @@ package tables;
  */
 public class User {
 
-    private final int age;
-    private final String name;
-    private final String address;
-    private final String job;
-    private final String nationality;
+    private int id;
+    private int age;
+    private String name;
+    private String address;
+    private String job;
+    private String nationality;
     private final String username;
     private String password;
 
-    public User(int age, String name, String address, String job, String nationality, String username) {        
+    public User(int age, String name, String address, String job, String nationality, String username) {
         this.age = age;
         this.name = name;
         this.address = address;
         this.job = job;
         this.nationality = nationality;
         this.username = username;
+    }
+
+    public User(String username) {
+        this.username = username;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setPassword(String password) {
@@ -54,6 +67,5 @@ public class User {
     public String getUsername() {
         return username;
     }
-
 
 }

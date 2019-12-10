@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import services.UserService;
 import tables.User;
 
@@ -19,6 +20,7 @@ import tables.User;
 public class Users extends javax.swing.JFrame {
 
     private final Connection connect;
+    private final UserService userService;
 
     /**
      * Creates new form Users
@@ -28,16 +30,28 @@ public class Users extends javax.swing.JFrame {
     public Users(Connection connect) {
         initComponents();
         this.connect = connect;
+        userService = new UserService(connect);
+        hideUnnecessaryFields();
         showUsers();
     }
 
+    private void hideUnnecessaryFields() {
+        idField.setVisible(false);
+
+        usersTable.getColumnModel().getColumn(6).setMinWidth(0);    // Hide username column
+        usersTable.getColumnModel().getColumn(6).setMaxWidth(0);
+
+        usersTable.getColumnModel().getColumn(7).setMinWidth(0);    // Hide password column
+        usersTable.getColumnModel().getColumn(7).setMaxWidth(0);
+    }
+
     private void showUsers() {
-        ArrayList<User> list = new UserService(connect).fetchUsers();
+        ArrayList<User> list = userService.fetchUsers();
         DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
         model.getDataVector().removeAllElements();
         Object[] row = new Object[6];
         for (int i = 0; i < list.size(); i++) {
-            row[0] = i + 1;
+            row[0] = list.get(i).getId();
             row[1] = list.get(i).getName();
             row[2] = list.get(i).getAge();
             row[3] = list.get(i).getAddress();
@@ -75,6 +89,8 @@ public class Users extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         passwordField = new javax.swing.JPasswordField();
+        jButton3 = new javax.swing.JButton();
+        idField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -83,14 +99,14 @@ public class Users extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Age", "Address", "Job", "nationality"
+                "ID", "Name", "Age", "Address", "Job", "nationality", "username", "password"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -101,13 +117,21 @@ public class Users extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        usersTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                usersTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(usersTable);
         if (usersTable.getColumnModel().getColumnCount() > 0) {
             usersTable.getColumnModel().getColumn(0).setResizable(false);
             usersTable.getColumnModel().getColumn(1).setResizable(false);
+            usersTable.getColumnModel().getColumn(2).setResizable(false);
             usersTable.getColumnModel().getColumn(3).setResizable(false);
             usersTable.getColumnModel().getColumn(4).setResizable(false);
             usersTable.getColumnModel().getColumn(5).setResizable(false);
+            usersTable.getColumnModel().getColumn(6).setResizable(false);
+            usersTable.getColumnModel().getColumn(7).setResizable(false);
         }
 
         jPanel1.setBackground(new java.awt.Color(204, 255, 255));
@@ -140,6 +164,13 @@ public class Users extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -153,12 +184,11 @@ public class Users extends javax.swing.JFrame {
                         .addComponent(ageField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                         .addComponent(addressField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
@@ -168,12 +198,6 @@ public class Users extends javax.swing.JFrame {
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(nationalityField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addComponent(jButton1)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton2)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6)
@@ -181,13 +205,25 @@ public class Users extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                            .addComponent(passwordField))))
+                            .addComponent(passwordField)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(idField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addContainerGap()
+                .addComponent(idField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -218,7 +254,8 @@ public class Users extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
 
@@ -229,7 +266,7 @@ public class Users extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -246,11 +283,19 @@ public class Users extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        if (idField.getText().equals("")) {
+            saveUserData();
+        } else {
+            updateUserData();
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void saveUserData() {
         int ageValue = Integer.parseInt(ageField.getText());
         User user = new User(ageValue, nameField.getText(), addressField.getText(), jobField.getText(), nationalityField.getText(), usernameField.getText());
         user.setPassword(new String(passwordField.getPassword()));
 
-        boolean result = new UserService(connect).saveUser(user);
+        boolean result = userService.saveUser(user);
 
         if (result) {
             JOptionPane.showMessageDialog(null, "Success", "User data saved successfully.", JOptionPane.INFORMATION_MESSAGE);
@@ -259,12 +304,59 @@ public class Users extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(null, "Error", "Problem in saving user data.", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }
+
+    private void updateUserData() {
+        int ageValue = Integer.parseInt(ageField.getText());
+        User user = new User(ageValue, nameField.getText(), addressField.getText(), jobField.getText(), nationalityField.getText(), usernameField.getText());
+        user.setPassword(new String(passwordField.getPassword()));
+        user.setId(Integer.parseInt(idField.getText()));
+
+        boolean result = userService.updateUser(user);
+
+        if (result) {
+            JOptionPane.showMessageDialog(null, "Success", "User data saved successfully.", JOptionPane.INFORMATION_MESSAGE);
+            emptyInputFields();
+            showUsers();
+        } else {
+            JOptionPane.showMessageDialog(null, "Error", "Problem in saving user data.", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         emptyInputFields();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        int id = Integer.parseInt(idField.getText());
+
+        boolean result = userService.deleteUser(id);
+
+        if (result) {
+            JOptionPane.showMessageDialog(null, "Success", "User data deleted successfully.", JOptionPane.INFORMATION_MESSAGE);
+            emptyInputFields();
+            showUsers();
+        } else {
+            JOptionPane.showMessageDialog(null, "Error", "Problem in deleting user data.", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void usersTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_usersTableMouseClicked
+        // TODO add your handling code here:
+        int index = usersTable.getSelectedRow();
+        TableModel model = usersTable.getModel();
+        int id = Integer.parseInt(model.getValueAt(index, 0).toString());
+        idField.setText(model.getValueAt(index, 0).toString());
+        nameField.setText(model.getValueAt(index, 1).toString());
+        ageField.setText(model.getValueAt(index, 2).toString());
+        addressField.setText(model.getValueAt(index, 3).toString());
+        jobField.setText(model.getValueAt(index, 4).toString());
+        nationalityField.setText(model.getValueAt(index, 5).toString());
+        User user = userService.showUser(id);
+        usernameField.setText(user.getUsername());
+    }//GEN-LAST:event_usersTableMouseClicked
 
     private void emptyInputFields() {
         nameField.setText("");
@@ -280,8 +372,10 @@ public class Users extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField addressField;
     private javax.swing.JTextField ageField;
+    private javax.swing.JTextField idField;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
